@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  passwordHash  String
+  startDate     DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tasks         Task[]
+  habits        Habit[]
+  habitLogs     HabitLog[]
+  goals         Goal[]
+  dailyLogs     DailyLog[]
+  hourlyLogs    HourlyLog[]
+  selfies       Selfie[]
+  expenses      Expense[]
+  incomes       Income[]
+  investments   Investment[]
+  dematHoldings DematHolding[]
+  timeBlocks    TimeBlock[]
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  domain      String   @default("Personal")
+  priority    String   @default("Medium")
+  impact      Int      @default(3)
+  status      String   @default("not_started")
+  durationMin Int      @default(30)
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Habit {
+  id       String     @id @default(cuid())
+  userId   String
+  name     String
+  domain   String     @default("Personal")
+  streak   Int        @default(0)
+  bestStreak Int      @default(0)
+  createdAt DateTime  @default(now())
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs     HabitLog[]
+}
+
+model HabitLog {
+  id        String   @id @default(cuid())
+  habitId   String
+  userId    String
+  date      DateTime
+  completed Boolean  @default(false)
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([habitId, date])
+}
+
+model Goal {
+  id       String   @id @default(cuid())
+  userId   String
+  name     String
+  domain   String
+  progress Int      @default(0)
+  health   String   @default("green")
+  target   String?
+  metric   String?
+  createdAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DailyLog {
+  id              String   @id @default(cuid())
+  userId          String
+  date            DateTime
+  score           Int      @default(0)
+  deepWorkHours   Float    @default(0)
+  learningHours   Float    @default(0)
+  dsaProblems     Int      @default(0)
+  fitnessDone     Boolean  @default(false)
+  contentDone     Boolean  @default(false)
+  energy          Int      @default(3)
+  stress          Int      @default(3)
+  sleepQuality    Int      @default(3)
+  notes           String?
+  tomorrowPriority String?
+  submitted       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, date])
+}
+
+model HourlyLog {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime
+  hour        Int
+  activity    String
+  domain      String   @default("Personal")
+  productivity Int     @default(3)
+  notes       String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Selfie {
+  id           String   @id @default(cuid())
+  userId       String
+  date         DateTime
+  filename     String
+  originalName String
+  sizeBytes    Int
+  mimeType     String
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, date])
+}
+
+model Expense {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Float
+  category  String
+  note      String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Income {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Float
+  source    String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Investment {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  type          String
+  amountInvested Float
+  currentValue  Float
+  platform      String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DematHolding {
+  id            String   @id @default(cuid())
+  userId        String
+  symbol        String
+  name          String
+  quantity      Float
+  avgPrice      Float
+  currentPrice  Float
+  assetType     String   @default("Equity")
+  broker        String?
+  notes         String?
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TimeBlock {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  startTime String
+  endTime   String?
+  activity  String
+  status    String   @default("planned")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

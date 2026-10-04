@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #020617;
+  --card: #0f172a;
+  --border: #1e293b;
+}
+
+body {
+  background: var(--bg);
+  color: #e2e8f0;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+.card {
+  @apply bg-slate-900 border border-slate-800 rounded-xl;
+}
